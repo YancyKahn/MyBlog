@@ -1,0 +1,25 @@
+{% load thumbnail %}
+
+<span class="Blog-side-title">推荐列表</span>
+<div class="ui unstackable divided items">
+
+    {% for item in recommend_list %}
+    <div class="item">
+        <div class="ui tiny image">
+            {% thumbnail item.cover "300x200" crop="center" as im %}
+            <img class="ui image" src="{{ im.url }}">
+            {% empty %}
+            {% endthumbnail %}
+        </div>
+        <div class="middle aligned content">
+            <a class=" header-title" href="{% url 'blog:detail' item.pk %}">{{ item.title }}</a>
+            <div class="meta">
+                <span class="description">{{ item.view_count }}次阅读</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <h3>暂无推荐</h3>
+    {% endfor %}
+
+</div>

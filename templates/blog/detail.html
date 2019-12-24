@@ -1,0 +1,86 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block css %}
+{% load custom_filter %}
+
+<link rel="stylesheet" href="{% static 'css/dropload.css' %}">
+<link rel="stylesheet" href="/static/css/markdown.css">
+{% endblock css %}
+
+{% block content %}
+<div class="ui unstackable two column grid">
+    <div class=" ten wide column">
+
+
+      <!---文章标题信息--->
+      <div class="">
+
+      </div>
+      <h3 class="arc-title index-title">{{ blog.title }} </h3>
+      <div class="post-line bg-color">
+          <ul>
+                <li><a title="{{ blog.author }}发表于{{ blog.edit_time }}">
+                   <i class="el-time"></i>发表于：&nbsp;&nbsp;&nbsp;
+                  <time>{{ blog.edit_time }}</time>
+              </a></li>
+              <li><a href="#"><i class="el-user">
+                  作者：&nbsp;&nbsp;&nbsp;
+                  </i>{{ blog.author }}</a></li>
+              <li><a title="已有 {{ blog.view_count }} 次浏览"><i class="el-eye-open">
+                  阅读次数：&nbsp;&nbsp;&nbsp;
+                  </i>{{ blog.view_count }}</a></li>
+          </ul>
+      </div>
+
+      <br>
+      <!--文章正文-->
+      <div class="article-content bg-color markdown-body">
+          <div class="post-content" style="padding: 10px 20px 20px 10px">
+              {{ blog.content|custom_markdown|safe }}
+          </div>
+      </div>
+
+
+        <div class="ui comments">
+            {% if user.is_authenticated %}
+            <form class="ui reply form" id="comment_form" method="post"
+                  action="{% url 'comment:submit_comment' blog.pk %}">
+                {% csrf_token %}
+                <div class="field">
+                    {{form.content}}
+                    <input type="hidden" value="{{ blog.id }}" name="blog_id">
+                </div>
+                <button class="ui primary button" type="submit">
+                    添加评论
+                </button>
+                <div class="ui info message n">
+                    <div class="item" id="comment-result"></div>
+                </div>
+            </form>
+            {% else %}
+            <div class="ui ignored info attached message">
+                <p>登录后即可评论 &nbsp;&nbsp;&nbsp;<a href="{% url 'user:login' %}?next={{ request.path }}">马上登录</a></p>
+            </div>
+            {% endif %}
+            <h3 class="ui dividing header" id="id_comment_label">评论</h3>
+            <div class="comment-list"></div>
+        </div>
+    </div>
+    <div class="six wide column">
+        {% include "blog/recommend.html" %}
+        {% include "blog/ad.html" %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+
+<script>
+var comments_url = "{% url 'comment:get_comments' %}"
+var blog_id = {{ blog.id }}
+</script>
+
+<script src="{% static 'js/dropload.js' %}"></script>
+<script src="{% static 'js/load_comments_blog.js' %}"></script>
+<script src="{% static 'js/detail.js' %}"></script>
+{% endblock javascript %}
